@@ -46,10 +46,14 @@ def prepare_data():
     # JFLEG
     X_jfleg = process_texts(df_jfleg["sentence"].astype(str))
     y_jfleg = df_jfleg["corrections"].astype(str)
+    X_jfleg_train_raw, X_jfleg_test_raw, y_jfleg_train_raw, y_jfleg_test_raw = train_test_split(X_jfleg, y_jfleg, test_size=0.2, random_state=42)
+
+    y_jfleg_train = np.array([1 if str(c).strip() != "" else 0 for c in y_jfleg_train_raw])
+    y_jfleg_test = np.array([1 if str(c).strip() != "" else 0 for c in y_jfleg_test_raw])
 
     return {
         "tokenizer": tokenizer,
         "asap": train_test_split(X_asap, y_asap, test_size=0.2, random_state=42),
         "commonlit": train_test_split(X_commonlit, y_commonlit, test_size=0.2, random_state=42),
-        "jfleg": train_test_split(X_jfleg, y_jfleg, test_size=0.2, random_state=42)
+        "jfleg": (X_jfleg_train_raw, X_jfleg_test_raw, y_jfleg_train, y_jfleg_test)
     }

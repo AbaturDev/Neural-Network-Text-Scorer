@@ -21,3 +21,15 @@ def plot_visualizer(history, title="Model Training History"):
 
     plt.tight_layout()
     plt.show()
+
+def plot_mse(mse_values, datasets):
+    plt.figure(figsize=(8, 6))
+    plt.bar(datasets, mse_values, color='skyblue')
+    plt.xlabel('Dataset')
+    plt.ylabel('Mean Squared Error')
+    plt.title('Mean Squared Error on Test Sets')
+    for i, v in enumerate(mse_values):
+        plt.text(i, v + 0.01, f'{v:.4f}', ha='center', va='bottom')
+    plt.grid(axis='y')
+    plt.tight_layout()
+    plt.show()
