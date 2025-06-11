@@ -51,4 +51,4 @@ if uploaded_file is not None:
             st.subheader("📊 Score:")
             st.write("📘 ASAP (grade):", float(pred[0][0]))
             st.write("📗 CommonLit (readability):", float(pred[1][0]))
-            st.write("📕 JFLEG (is text grammary correct):", "YES" if pred[2][0] > 0.5 else "NO")
+            st.write("📕 JFLEG (is text grammary correct):", float(pred[2][0]))
