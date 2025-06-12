@@ -3,3 +3,6 @@ tensorflow
 pandas
 scikit-learn
 matplotlib
+fitz
+streamlit
+PyMuPDF
