@@ -87,7 +87,9 @@ def prepare_data():
 
     df_all = pd.concat([df_asap_clean, df_commonlit_clean, df_jfleg_clean], ignore_index=True)
     
-    df_train, df_test = train_test_split(df_all, test_size=0.2, random_state=42)
+    df_train, df_temp = train_test_split(df_all, test_size=0.2, random_state=42)
+    df_val, df_test = train_test_split(df_temp, test_size=0.5, random_state=42)
+
 
     def extract_data(df):
         X = np.stack(df["X"].values)
@@ -112,11 +114,13 @@ def prepare_data():
         }
 
     X_train, y_train, sw_train = extract_data(df_train)
+    X_val, y_val, sw_val = extract_data(df_val)
     X_test, y_test, sw_test = extract_data(df_test)
 
     return {
         "tokenizer": tokenizer,
         "scaler": scaler,
         "train": (X_train, y_train, sw_train),
+        "validation": (X_val, y_val, sw_val),
         "test": (X_test, y_test, sw_test)
     }
