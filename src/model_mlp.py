@@ -1,6 +1,6 @@
 import tensorflow as tf
-from tensorflow.keras import layers, Model, Input # type: ignore
-from tensorflow.keras.regularizers import l2 # type: ignore
+from tensorflow.keras import layers, Model, Input
+from tensorflow.keras.regularizers import l2
 
 VOCAB_SIZE = 20000
 EMBEDDING_DIM = 256
@@ -9,45 +9,75 @@ def build_mlp_multihead():
     text_input = Input(shape=(300,), name="text_input")
     
     embedded = layers.Embedding(VOCAB_SIZE, EMBEDDING_DIM, mask_zero=True)(text_input)
-    pooled = layers.GlobalAveragePooling1D()(embedded)
     
-    shared_features = layers.Dense(128, activation='relu', kernel_regularizer=l2(0.001), name='shared_features')(pooled)
-    shared_features = layers.BatchNormalization()(shared_features)
-    shared_features = layers.Dropout(0.3)(shared_features)
+    embedded = layers.Dropout(0.2)(embedded)
     
-    shared_features_2 = layers.Dense(64, activation='relu', name='shared_features_2')(shared_features)
-    shared_features_2 = layers.Dropout(0.3)(shared_features_2)
+    avg_pool = layers.GlobalAveragePooling1D()(embedded)
+    max_pool = layers.GlobalMaxPooling1D()(embedded)
     
-    asap_dense = layers.Dense(32, activation='relu', name='asap_head')(shared_features_2)
-    score_output = layers.Dense(1, name="score_output")(asap_dense)
+    pooled = layers.Concatenate()([avg_pool, max_pool])
     
-    commonlit_dense = layers.Dense(32, activation='relu', name='commonlit_head')(shared_features_2)
-    readability_output = layers.Dense(1, name="readability_output")(commonlit_dense)
+    shared = layers.Dense(512, activation='relu', kernel_regularizer=l2(0.001))(pooled)
+    shared = layers.BatchNormalization()(shared)
+    shared = layers.Dropout(0.4)(shared)
     
-    jfleg_dense = layers.Dense(32, activation='relu', name='jfleg_head')(shared_features_2)
-    jfleg_output = layers.Dense(1, activation='sigmoid', name="jfleg_output")(jfleg_dense)
+    shared = layers.Dense(256, activation='relu', kernel_regularizer=l2(0.001))(shared)
+    shared = layers.BatchNormalization()(shared)
+    shared = layers.Dropout(0.3)(shared)
+    
+    shared = layers.Dense(128, activation='relu', kernel_regularizer=l2(0.001))(shared)
+    shared = layers.BatchNormalization()(shared)
+    shared = layers.Dropout(0.3)(shared)
+    
+    asap_head = layers.Dense(64, activation='relu', name='asap_head_1')(shared)
+    asap_head = layers.BatchNormalization()(asap_head)
+    asap_head = layers.Dropout(0.2)(asap_head)
+    asap_head = layers.Dense(32, activation='relu', name='asap_head_2')(asap_head)
+    score_output = layers.Dense(1, name="score_output")(asap_head)
+    
+    commonlit_head = layers.Dense(64, activation='relu', name='commonlit_head_1')(shared)
+    commonlit_head = layers.BatchNormalization()(commonlit_head)
+    commonlit_head = layers.Dropout(0.2)(commonlit_head)
+    commonlit_head = layers.Dense(32, activation='relu', name='commonlit_head_2')(commonlit_head)
+    readability_output = layers.Dense(1, name="readability_output")(commonlit_head)
+    
+    jfleg_head = layers.Dense(128, activation='relu')(shared)
+    jfleg_head = layers.BatchNormalization()(jfleg_head)
+    jfleg_head = layers.Dropout(0.4)(jfleg_head)
+    jfleg_head = layers.Dense(64, activation='relu')(jfleg_head)
+    jfleg_head = layers.BatchNormalization()(jfleg_head)
+    jfleg_head = layers.Dropout(0.3)(jfleg_head)
+    jfleg_head = layers.Dense(32, activation='relu')(jfleg_head)
+    jfleg_head = layers.BatchNormalization()(jfleg_head)
+    jfleg_head = layers.Dropout(0.2)(jfleg_head)
+    jfleg_output = layers.Dense(1, activation='sigmoid', name="jfleg_output")(jfleg_head)
     
     model = Model(
         inputs=text_input,
         outputs=[score_output, readability_output, jfleg_output]
     )
     
+    optimizer = tf.keras.optimizers.Adam(
+        learning_rate=0.001,
+        clipnorm=1.0
+    )
+    
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+        optimizer=optimizer,
         loss={
             "score_output": "mse",
             "readability_output": "mse",  
             "jfleg_output": "binary_crossentropy"
         },
         loss_weights={
-            "score_output": 0.1,
+            "score_output": 15.0,
             "readability_output": 1.0,
-            "jfleg_output": 5.0
+            "jfleg_output": 8.0
         },
         metrics={
             "score_output": ["mae"],
             "readability_output": ["mae"],
-            "jfleg_output": ["accuracy"]
+            "jfleg_output": ["accuracy", "precision", "recall"]
         }
     )
     

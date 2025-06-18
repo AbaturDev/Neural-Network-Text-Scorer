@@ -90,7 +90,6 @@ def prepare_data():
     df_train, df_temp = train_test_split(df_all, test_size=0.2, random_state=42)
     df_val, df_test = train_test_split(df_temp, test_size=0.5, random_state=42)
 
-
     def extract_data(df):
         X = np.stack(df["X"].values)
         
