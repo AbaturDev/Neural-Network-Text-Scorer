@@ -31,7 +31,7 @@ model = build_mlp_multihead()
 #model = load_model(model_path)
 
 early_stop = EarlyStopping(
-        monitor="val_jfleg_output_accuracy",  # Monitoruj JFLEG accuracy
+        monitor="val_jfleg_output_accuracy",
         patience=10, 
         restore_best_weights=True, 
         min_delta=0.005,
@@ -48,7 +48,7 @@ reduce_lr = ReduceLROnPlateau(
 )
 
 checkpoint = ModelCheckpoint(
-    'best_model_temp.keras',
+    model_path,
     monitor='val_jfleg_output_accuracy',
     save_best_only=True,
     mode='max',
@@ -71,29 +71,13 @@ sw_val_list = [sw_val["score_output"], sw_val["readability_output"], sw_val["jfl
 y_train_list = [y_train["score_output"], y_train["readability_output"], y_train["jfleg_output"]]
 y_val_list = [y_val["score_output"], y_val["readability_output"], y_val["jfleg_output"]]
 
-weights = compute_class_weight(
-    class_weight='balanced',
-    classes=np.array([0, 1]),
-    y=sw_train['jfleg_output']
-)
-class_weight = dict(enumerate(weights))
-
-y_jfleg = y_train['jfleg_output'].round().astype(float)
-sample_weights_jfleg = np.vectorize(class_weight.get)(y_jfleg).astype(np.float32)
-
-sw_train_list = [
-    sw_train["score_output"],
-    sw_train["readability_output"],
-    sample_weights_jfleg  # zamiast sw_train["jfleg_output"]
-]
-
 history = model.fit(
     X_train,
     y_train_list,
     sample_weight=sw_train_list,
     validation_data=(X_val, y_val_list, sw_val_list),
-    epochs=50,  # Więcej epok
-    batch_size=32,  # Mniejszy batch size
+    epochs=50,
+    batch_size=32,
     callbacks=[early_stop, reduce_lr, checkpoint, lr_scheduler],
     verbose=1,
 )
