@@ -11,9 +11,6 @@ def dummy(n, shape=(1,)):
     return np.zeros((n,) + shape, dtype=np.float32)
 
 
-EPOCHS = 20
-BATCH_SIZE = 64
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model_path = os.path.join(BASE_DIR, "models", "cnn.keras")
 
