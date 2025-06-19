@@ -1,9 +1,9 @@
 import numpy as np
 import os
+import visualize
 from model_mlp import build_mlp_multihead
 from data_preparation import prepare_data
 from evaluate import evaluate_model
-from visualize import plot_visualizer, plot_mse, plot_all_metrics_comparison
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, LearningRateScheduler # type: ignore
 from tensorflow.keras.models import load_model # type: ignore
 from sklearn.utils.class_weight import compute_class_weight
@@ -82,7 +82,13 @@ history = model.fit(
     verbose=1,
 )
 
-evaluate_model(model, data)
+visualize.visualize_training(history, "MLP Multi-Head Model - Experiment 1")
+
+ev_result = evaluate_model(model, data)
+
+visualize.visualize_evaluation(ev_result)
+
+#visualize.create_comprehensive_report(history, ev_result, loss_weights, "MLP Multi-Head Final Model", save_dir="./plots")
 
 os.makedirs(os.path.dirname(model_path), exist_ok=True)
 model.save(model_path)

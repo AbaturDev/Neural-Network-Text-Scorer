@@ -53,7 +53,7 @@ def build_rnn_multihead():
     model = Model(inputs=text_input, outputs=[score_output, readability_output, jfleg_output])
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=1.0)
-
+    
     model.compile(
         optimizer=optimizer,
         loss={
