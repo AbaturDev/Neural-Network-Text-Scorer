@@ -25,7 +25,7 @@ def dummy(n, shape=(1,)):
     return np.zeros((n,) + shape, dtype=np.float32)
 
 # NEW MODEL OPTION
-model = build_mlp_multihead()
+model, loss_weights = build_mlp_multihead()
 
 # LOAD SAVED MODEL
 #model = load_model(model_path)
@@ -82,13 +82,13 @@ history = model.fit(
     verbose=1,
 )
 
-visualize.visualize_training(history, "MLP Multi-Head Model - Experiment 1")
+visualize.visualize_training(history, "MLP Multi-Head Model")
 
 ev_result = evaluate_model(model, data)
 
 visualize.visualize_evaluation(ev_result)
 
-#visualize.create_comprehensive_report(history, ev_result, loss_weights, "MLP Multi-Head Final Model", save_dir="./plots")
+visualize.create_comprehensive_report(history, ev_result, loss_weights, "MLP Multi-Head Model", save_dir="./plots")
 
 os.makedirs(os.path.dirname(model_path), exist_ok=True)
 model.save(model_path)

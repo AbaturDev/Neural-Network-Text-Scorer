@@ -22,7 +22,6 @@ def build_rnn_multihead():
     shared = layers.BatchNormalization()(shared)
     shared = layers.Dropout(0.3)(shared)
 
-    # Głowy
     asap = layers.Dense(32, activation='relu')(shared)
     asap = layers.Dropout(0.2)(asap)
     score_output = layers.Dense(1, name="score_output")(asap)
@@ -40,6 +39,12 @@ def build_rnn_multihead():
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=1.0)
     
+    loss_weights={
+        "score_output": 5.0,
+        "readability_output": 1.0,
+        "jfleg_output": 8.0
+    }
+
     model.compile(
         optimizer=optimizer,
         loss={
@@ -47,11 +52,7 @@ def build_rnn_multihead():
             "readability_output": "mse",
             "jfleg_output": "binary_crossentropy"
         },
-        loss_weights={
-            "score_output": 5.0,
-            "readability_output": 2.0,
-            "jfleg_output": 3.0
-        },
+        loss_weights=loss_weights,
         metrics={
             "score_output": ["mae"],
             "readability_output": ["mae"],
@@ -59,4 +60,4 @@ def build_rnn_multihead():
         }
     )
 
-    return model
+    return model, loss_weights

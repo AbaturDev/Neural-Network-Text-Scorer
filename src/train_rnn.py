@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import visualize
 from model_rnn import build_rnn_multihead
 from data_preparation import prepare_data
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, LearningRateScheduler
@@ -22,7 +23,7 @@ X_test, y_test, sw_test = data["test"]
 
 
 # NEW MODEL OPTION
-model = build_rnn_multihead()
+model, loss_weights = build_rnn_multihead()
 
 # LOAD SAVED MODEL OPTION
 # model = load_model(model_path)
@@ -79,7 +80,13 @@ history = model.fit(
     verbose=1,
 )
 
-evaluate_model(model, data)
+visualize.visualize_training(history, "RNN Multi-Head Model")
+
+ev_result = evaluate_model(model, data)
+
+visualize.visualize_evaluation(ev_result)
+
+visualize.create_comprehensive_report(history, ev_result, loss_weights, "RNN Multi-Head Model", save_dir="./plots")
 
 os.makedirs(os.path.dirname(model_path), exist_ok=True)
 model.save(model_path)

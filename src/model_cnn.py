@@ -61,6 +61,12 @@ def build_cnn_multihead():
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, clipnorm=1.0)
 
+    loss_weights={
+        "score_output": 15.0,
+        "readability_output": 1.0,
+        "jfleg_output": 8.0
+    }
+
     model.compile(
         optimizer=optimizer,
         loss={
@@ -68,11 +74,7 @@ def build_cnn_multihead():
             "readability_output": "mse",
             "jfleg_output": "binary_crossentropy"
         },
-        loss_weights={
-            "score_output": 15.0,
-            "readability_output": 1.0,
-            "jfleg_output": 8.0
-        },
+        loss_weights=loss_weights,
         metrics={
             "score_output": ["mae"],
             "readability_output": ["mae"],
@@ -80,4 +82,4 @@ def build_cnn_multihead():
         }
     )
 
-    return model
+    return model, loss_weights
