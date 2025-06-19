@@ -7,7 +7,7 @@ import pandas as pd
 plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
 
-def plot_training_history(history, title="Multi-Head MLP Training History", save_path=None):
+def plot_training_history(history, title, save_path=None):
     fig, axes = plt.subplots(2, 3, figsize=(18, 12))
     fig.suptitle(f'{title}', fontsize=18, fontweight='bold')
     
@@ -411,10 +411,7 @@ def plot_loss_weights_analysis(history, loss_weights, save_path=None):
     plt.show()
 
 
-def visualize_training(history, title="MLP Multi-Head Model", save_dir=None):
-    """
-    Główna funkcja do wizualizacji - wrapper dla łatwego użycia
-    """
+def visualize_training(history, title, save_dir=None):
     save_path = None
     if save_dir:
         import os
@@ -425,9 +422,6 @@ def visualize_training(history, title="MLP Multi-Head Model", save_dir=None):
 
 
 def visualize_evaluation(results, save_dir=None):
-    """
-    Główna funkcja do wizualizacji wyników ewaluacji
-    """
     save_path = None
     if save_dir:
         import os
@@ -437,11 +431,7 @@ def visualize_evaluation(results, save_dir=None):
     plot_evaluation_results(results, save_path)
 
 
-def create_comprehensive_report(history, evaluation_results, loss_weights, 
-                               title="MLP Multi-Head Model Report", save_dir=None):
-    """
-    Tworzy kompletny raport wizualny z trenowania i ewaluacji
-    """
+def create_comprehensive_report(history, evaluation_results, loss_weights, title, save_dir=None):
     if save_dir:
         import os
         os.makedirs(save_dir, exist_ok=True)
