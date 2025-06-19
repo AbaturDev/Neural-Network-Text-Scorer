@@ -11,9 +11,6 @@ def dummy(n, shape=(1,)):
     return np.zeros((n,) + shape, dtype=np.float32)
 
 
-EPOCHS = 20
-BATCH_SIZE = 64
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model_path = os.path.join(BASE_DIR, "models", "rnn.keras")
 
@@ -32,19 +29,19 @@ model = build_rnn_multihead()
 
 early_stop = EarlyStopping(
     monitor="val_jfleg_output_accuracy",
-    patience=10,
+    patience=8,
     restore_best_weights=True,
-    min_delta=0.005,
+    min_delta=0.002,
     mode='max'
 )
 
 reduce_lr = ReduceLROnPlateau(
     monitor='val_loss',
-    factor=0.3,
+    factor=0.4,
     patience=4,
-    min_lr=1e-7,
+    min_lr=1e-6,
     verbose=1,
-    cooldown=2
+    cooldown=1
 )
 
 checkpoint = ModelCheckpoint(
